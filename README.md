@@ -1,1 +1,2 @@
-# PyStarsmasher
+# Readme for PyStarsmasher
+## Introduction
