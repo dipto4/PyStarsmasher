@@ -25,22 +25,22 @@ Below is a sample script that highlights how PyStarsmasher works:
 ```
 from PyStarsmasher import Starsmasher
 
- someSimulation = Starsmasher()
+someSimulation = Starsmasher()
 
- someSimulation.n = 10000        # particles per simulation
- someSimulation.nnopt = 23       # Nearest neighbors
- someSimulation.dtout = 1        # Output frequency
- someSimulation.tf = 200         # Final time (in SPH units)
+someSimulation.n = 10000        # particles per simulation
+someSimulation.nnopt = 23       # Nearest neighbors
+someSimulation.dtout = 1        # Output frequency
+someSimulation.tf = 200         # Final time (in SPH units)
 
- someSimulation.starmass = 0.5   # units are MSun
- someSimulation.starradius = 0.3 # units are RSun
+someSimulation.starmass = 0.5   # units are MSun
+someSimulation.starradius = 0.3 # units are RSun
 
- someSimulation.ppn = 16
- someSimulation.simulationType = '1es'   # Relaxation run
+someSimulation.ppn = 16
+someSimulation.simulationType = '1es'   # Relaxation run
 
- someSimulation.setparams()      # sets these parameters
+someSimulation.setparams()      # sets these parameters
 
- someSimulation.runsim()         # runs the simulation
+someSimulation.runsim()         # runs the simulation
  ```
  Open your favorite text editor. For example type `vi test.py` and then save it. Make sure the file is in the same directory as the other python files. 
  
