@@ -1,0 +1,8 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=16:gpus=1
+#PBS -l walltime=2400:00:00
+#PBS -q default
+
+source ~/.bashrc
+cd "$PBS_O_WORKDIR"
+mpirun -n 16 python collisionScript.py > output 

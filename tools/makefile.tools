@@ -1,0 +1,8 @@
+FC=gfortran
+FCFLAGS= -fPIC -shared -ffixed-line-length-132
+LIBFILE=tools.so
+toolsmake:
+	$(FC) $(FCFLAGS) -o $(LIBFILE) calculateRemainingMass.f getPosData.f
+
+clean:
+	rm *.so
