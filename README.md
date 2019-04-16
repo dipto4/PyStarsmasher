@@ -53,3 +53,4 @@ Unlike traditional Starsmasher, the data generated through PyStarsmasher is put 
 ## Known Bugs
 1. The MPI issue, as mentioned before, is a major bug. Fixes are being tested. 
 2. Using `mpirun -n 16 python test.py` ensures that PyStarsmasher lets the fortran code use 16 threads to run the code. However, it also means that the script is run 16 times in parallel. This can be problematic when you're printing something or creating a file inside the script.
+3. I believe there are memory leaks within the program. Need to check...
