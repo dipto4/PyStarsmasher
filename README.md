@@ -38,7 +38,7 @@ someSimulation.starradius = 0.3 # units are RSun
 someSimulation.ppn = 16
 someSimulation.simulationType = '1es'   # Relaxation run
 
-someSimulation.setparams()      # sets these parameters
+someSimulation.setParams()      # sets these parameters
 
 someSimulation.runsim()         # runs the simulation
  ```
