@@ -2,6 +2,7 @@
 ## Introduction
 Traditionally, Starsmasher uses a fortran interface and input files like sph.input and sph.init to interact with the user. The purpose of this project is to let python handle all of the input and output functions for Starsmasher. The interface would allow the code to be coupled with other astrophysical codes in libraries like AMUSE. 
 
+To run the collision script, one needs to evolve a star cluster using NBODY6. The version of NBODY6 that tracks collisions is present here: https://github.com/dipto4/NBODY6_collision_detection
 ## Development History
 April 15, 2019 -- First version of PyStarsmasher uploaded. Still in early stages of development. The input functions built inside fortran have been replaced with python counterparts that allow the user to interact with the code using python scripts.
 
