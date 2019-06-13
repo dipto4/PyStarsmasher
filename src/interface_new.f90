@@ -191,7 +191,7 @@ subroutine PythonSetValues(parent)
     call MPI_TYPE_COMMIT(input_type,ierr)
 
 
-    call MPI_BCAST(ci,1,input_type,parent,ierr)
+    call MPI_BCAST(ci,1,input_type,0,parent,ierr)
     
     call MPI_BCAST(Pstartfile1,255,MPI_CHARACTER,0,parent,ierr)
     call MPI_BCAST(Pstartfile2,255,MPI_CHARACTER,0,parent,ierr)
@@ -329,8 +329,8 @@ subroutine PythonInitializeDouble(parent)
     call MPI_TYPE_CREATE_STRUCT(7,blocklen,disp1,typ,params_type,ierr)
     call MPI_TYPE_COMMIT(params_type,ierr)
 
-    call MPI_BCAST(star1,1,params_type,parent,ierr)
-    call MPI_BCAST(star2,1,params_type,parent,ierr)
+    call MPI_BCAST(star1,1,params_type,0,parent,ierr)
+    call MPI_BCAST(star2,1,params_type,0,parent,ierr)
 
 
 
@@ -354,4 +354,35 @@ subroutine PythonInitializeDouble(parent)
     m1 = star1%m
     m2 = star2%m
 
+end subroutine
+
+
+subroutine TestSetValues
+    include 'starsmasher.h'
+    common/simtype/simulationtype
+    
+    character*3 simulationtype
+    
+    
+    print *,cn1,cn2,cn3,cn4,cn5,cn6,cn7
+    print *, gam
+    print *, starmass
+    print *, starradius
+    print *, munit
+    print *, runit
+    print *, startfile1
+    print *, startfile2
+    print *, simulationtype
+end subroutine
+
+subroutine TestSetDoubleValues
+
+common/doubleinitialize/x1,y1,z1,x2,y2,z2,vx1,vy1,vz1,vx2,vy2,vz2,m1,m2
+    
+
+    real*8 x1,y1,z1,x2,y2,z2,vx1,vy1,vz1,vx2,vy2,vz2,m1,m2
+
+
+    print*,x1,y1,z1,vx1,vy1,vz1,m1
+    print*,x2,y2,z2,vx2,vy2,vz2,m2
 end subroutine
