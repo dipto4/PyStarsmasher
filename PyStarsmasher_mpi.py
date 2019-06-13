@@ -16,8 +16,8 @@ class Starsmasher(object):
     def __init__(self):
         Starsmasher.__instance__ = self
 
-        self.library = cdll.LoadLibrary('./libstarsmasher.so')
-        self.toolsLibrary = cdll.LoadLibrary('./tools.so')
+        #self.library = cdll.LoadLibrary('./libstarsmasher.so')
+        #self.toolsLibrary = cdll.LoadLibrary('./tools.so')
         # The following variables are present in
         # sph.input
 
@@ -162,7 +162,7 @@ class Starsmasher(object):
 
         dtype_input = [('ndisplace',np.int32),('displacex',np.float64),('displacey',np.float64),
                 ('displacez',np.float64),('semimajoraxis',np.float64),('e0',np.float64),
-                ('bimpact',np.float64),('trelax',np.float64),('vinf2',np.float64),('tf',np.float64)
+                ('bimpact',np.float64),('trelax',np.float64),('vinf2',np.float64),('tf',np.float64),
                 ('dtout',np.float64),('equalmass',np.float64),('n',np.int32),('gflag',np.int32),
                 ('nnopt',np.int32),('nav',np.int32),('ngr',np.int32),('nrelax',np.int32),
                 ('alpha',np.float64),('beta',np.float64),('cn1',np.float64),('cn2',np.float64),
@@ -171,7 +171,7 @@ class Starsmasher(object):
                 ('sepfinal',np.float64),('sep0',np.float64),('treloff',np.float64),('tresplintmuoff',np.float64),
                 ('nitpot',np.int32),('nintvar',np.int32),('ngravprocs',np.int32),('qthreads',np.int32),
                 ('mbh',np.float64),('runit',np.float64),('munit',np.float64),
-                ('computeexclusivemode',np.float64),('ppn',np.float64),('omega_spin',np.float64),
+                ('computeexclusivemode',np.int32),('ppn',np.int32),('omega_spin',np.float64),
                 ('neos',np.int32),('nselfgravity',np.int32),('ncooling',np.int32),('nkernel',np.int32),
                 ('gam',np.float64),('reat',np.float64),('teq',np.float64),('tjumpahead',np.float64),
                 ('starmass',np.float64),('starradius',np.float64),('throwaway',np.bool),
@@ -187,7 +187,7 @@ class Starsmasher(object):
             self.qthreads,self.mbh,self.runit,self.munit,self.computeexclusivemode,
             self.ppn,self.omega_spin,self.neos,self.nselfgravity,self.ncooling,
             self.nkernel,self.gam,self.reat,self.teq,self.tjumpahead,self.starmass,
-            self.starradius,self.throwaway,self.npoly)],dtype=dtype_input)
+            self.starradius,self.throwaway,self.stellarevolutioncodetype,self.npoly)],dtype=dtype_input)
 
         dtype_input_double = None
 
@@ -195,7 +195,7 @@ class Starsmasher(object):
         inputs_double_s1 = None
         inputs_double_s2 = None
 
-        if(self.simulationtype = 'dbl'):
+        if(self.simulationtype == 'dbl'):
             dtype_input_double = [('x',np.float64),('y',np.float64),('z',np.float64),
                     ('vx',np.float64),('vy',np.float64),('vz',np.float64),('m',np.float64)]
 
@@ -227,23 +227,23 @@ class Starsmasher(object):
         mpitype_dict = {np.int32:MPI.INT, np.float64:MPI.DOUBLE, np.bool:MPI.BOOL}
 
         input_offsets = [inputs.dtype.fields[field][1] for field in input_field_name]
-        input_field_mpitypes = [mpitype[dtype] for dtype in input_field_type]
+        input_field_mpitypes = [mpitype_dict[dtype] for dtype in input_field_type]
 
         input_structtype = MPI.Datatype.Create_struct([1]*len(input_field_name),input_offsets,input_field_mpitypes)
-        input_structtype = structtype.Create_resized(0,input_struct_size)
+        input_structtype = input_structtype.Create_resized(0,input_struct_size)
         input_structtype.Commit()
 
         input_double_structtype = None
 
 
-        if(self.simulationtype = 'dbl'):
+        if(self.simulationtype == 'dbl'):
             input_double_field_name = [lis[0] for lis in dtype_input_double]
             input_double_field_type = [lis[1] for lis in dtype_input_double]
 
             input_double_struct_size = inputs_double_s1.nbytes
 
-            input_double_offsets = [inputs_double_s1.fields[field] for field in input_double_field_name]
-            input_double_field_mpitypes = [mpitype[dtype] for dtype in input_double_field_type]
+            input_double_offsets = [inputs_double_s1.dtype.fields[field][1] for field in input_double_field_name]
+            input_double_field_mpitypes = [mpitype_dict[dtype] for dtype in input_double_field_type]
 
             input_double_structtype = MPI.Datatype.Create_struct([1]*len(input_double_field_name),input_double_offsets,input_double_field_mpitypes)
 
@@ -261,7 +261,7 @@ class Starsmasher(object):
 
 
     # note: this function is set to be deprecated and removed in later versions
-    def __setValuesStarsmasher(self):
+    def __setValuesStarsmasher_old(self):
 
         self.__getGamForStar()
 
@@ -457,7 +457,7 @@ class Starsmasher(object):
             os.system("mkdir " + self.dirname)
 
 
-        if(self.simulationtype = 'dbl'):
+        if(self.simulationtype == 'dbl'):
             inputs, input_structtype, inputs_double_s1, inputs_double_s2, input_double_structtype = self.__setValuesStarsmasher()
         else:
             inputs, input_structtype = self.__setValuesStarsmasher()
@@ -482,7 +482,7 @@ class Starsmasher(object):
         comm.Bcast([Psimulationtype,MPI.CHAR],root=MPI.ROOT)
         comm.Bcast([Pdirname,MPI.CHAR],root=MPI.ROOT)
 
-        if (self.simulationtype = 'dbl'):
+        if (self.simulationtype == 'dbl'):
             comm.Bcast([inputs_double_s1,input_double_structtype],root=MPI.ROOT)
             comm.Bcast([inputs_double_s2,input_double_structtype],root=MPI.ROOT)
 
@@ -502,7 +502,7 @@ class Starsmasher(object):
         self.__runStarsmasher()
         pass
 
-    def run(self):
-        worker = os.path.abspath("src/worker")
-        comm = MPI.COMM_SELF.Spawn(worker,args=[],maxprocs=16)
+    def run(self,num_of_workers=16):
+        worker = os.path.abspath("src/test_worker_code")
+        comm = MPI.COMM_SELF.Spawn(worker,args=[],maxprocs=num_of_workers)
         self.__setAndBcast(comm)
