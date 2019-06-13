@@ -84,7 +84,7 @@ subroutine PythonSetValues(parent)
     call MPI_GET_ADDRESS(ci%Pcn3,disp(23),ierr)
     call MPI_GET_ADDRESS(ci%Pcn4,disp(24),ierr)
     call MPI_GET_ADDRESS(ci%Pcn5,disp(25),ierr)
-    call MPI_GET_ADDRESS(ci%Pch6,disp(26),ierr)
+    call MPI_GET_ADDRESS(ci%Pcn6,disp(26),ierr)
     call MPI_GET_ADDRESS(ci%Pcn7,disp(27),ierr)
 
     call MPI_GET_ADDRESS(ci%Phco,disp(28),ierr)
@@ -102,7 +102,7 @@ subroutine PythonSetValues(parent)
     call MPI_GET_ADDRESS(ci%Prunit,disp(40),ierr)
     call MPI_GET_ADDRESS(ci%Pmunit,disp(41),ierr)
     call MPI_GET_ADDRESS(ci%Pcomputeexclusivemode,disp(42),ierr)
-    call MPI_GET_ADDRESS(ci%Ppn,disp(43),ierr)
+    call MPI_GET_ADDRESS(ci%Pppn,disp(43),ierr)
     call MPI_GET_ADDRESS(ci%Pomega_spin,disp(44),ierr)
     call MPI_GET_ADDRESS(ci%Pneos,disp(45),ierr)
     call MPI_GET_ADDRESS(ci%Pnselfgravity,disp(46),ierr)
@@ -257,7 +257,7 @@ subroutine PythonSetValues(parent)
     teq = ci%Pteq
     tjumpahead = ci%Ptjumpahead
     starmass = ci%Pstarmass
-    starradius = Pstarradius
+    starradius = ci%Pstarradius
     startfile1 = Pstartfile1
     startfile2 = Pstartfile2
     eosfile = Peosfile
@@ -292,6 +292,7 @@ subroutine PythonInitializeDouble(parent)
     integer :: params_type, ierr
     integer(KIND=MPI_ADDRESS_KIND) :: disp1(7), disp2(7),base1, base2, lb, extent
     
+    integer parent
 
     integer i
 
@@ -325,7 +326,7 @@ subroutine PythonInitializeDouble(parent)
         typ(i) = MPI_DOUBLE
     end do
 
-    call MPI_TYPE_CREATE_STRUCT(7,blocklen,disp,typ,params_type,ierr)
+    call MPI_TYPE_CREATE_STRUCT(7,blocklen,disp1,typ,params_type,ierr)
     call MPI_TYPE_COMMIT(params_type,ierr)
 
     call MPI_BCAST(star1,1,params_type,parent,ierr)
@@ -338,7 +339,7 @@ subroutine PythonInitializeDouble(parent)
     y1 = star1%y
     z1 = star1%z
 
-    x2 = sta2%x
+    x2 = star2%x
     y2 = star2%y
     z2 = star2%z
 
