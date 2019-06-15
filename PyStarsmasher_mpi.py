@@ -520,7 +520,7 @@ class Starsmasher(object):
         comm = MPI.COMM_SELF.Spawn(worker,args=[],maxprocs=num_of_workers)
         self.__setAndBcast(comm)
         comm.barrier()
-        comm.disconnect()
+        #comm.disconnect()
         MPI.Finalize()
 
         print "I return contrl immediately"
