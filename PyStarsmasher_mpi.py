@@ -154,7 +154,7 @@ class Starsmasher(object):
             print("Some value is lower than zero. Check it")
         pass
     #TODO: implement the mpi based setValuesStarsmasher_mpi function
-
+    #TODO: throwaway causes issues. CHange it
 
     def __setupValuesStarsmasher_mpi(self):
 
@@ -174,8 +174,11 @@ class Starsmasher(object):
                 ('computeexclusivemode',np.int32),('ppn',np.int32),('omega_spin',np.float64),
                 ('neos',np.int32),('nselfgravity',np.int32),('ncooling',np.int32),('nkernel',np.int32),
                 ('gam',np.float64),('reat',np.float64),('teq',np.float64),('tjumpahead',np.float64),
-                ('starmass',np.float64),('starradius',np.float64),('throwaway',np.bool),
+                ('starmass',np.float64),('starradius',np.float64),
                 ('stellarevolutioncodetype',np.int32),('npoly',np.float64)]
+
+
+        dtype_input_aligned = np.dtype(dtype_input,align=True)
 
 
         inputs = np.array([(self.ndisplace,self.displacex,self.displacey,self.displacez,
@@ -187,10 +190,9 @@ class Starsmasher(object):
             self.qthreads,self.mbh,self.runit,self.munit,self.computeexclusivemode,
             self.ppn,self.omega_spin,self.neos,self.nselfgravity,self.ncooling,
             self.nkernel,self.gam,self.reat,self.teq,self.tjumpahead,self.starmass,
-            self.starradius,self.throwaway,self.stellarevolutioncodetype,self.npoly)],dtype=dtype_input)
+            self.starradius,self.stellarevolutioncodetype,self.npoly)],dtype=dtype_input_aligned)
 
         dtype_input_double = None
-
 
         inputs_double_s1 = None
         inputs_double_s2 = None
@@ -224,10 +226,19 @@ class Starsmasher(object):
 
         input_struct_size = inputs.nbytes
 
-        mpitype_dict = {np.int32:MPI.INT, np.float64:MPI.DOUBLE, np.bool:MPI.BOOL}
+        print input_struct_size
+
+
+
+        mpitype_dict = {np.int32:MPI.INT, np.float64:MPI.DOUBLE}
 
         input_offsets = [inputs.dtype.fields[field][1] for field in input_field_name]
         input_field_mpitypes = [mpitype_dict[dtype] for dtype in input_field_type]
+
+        #print input_field_mpitypes
+        #print len(input_offsets)
+
+
 
         input_structtype = MPI.Datatype.Create_struct([1]*len(input_field_name),input_offsets,input_field_mpitypes)
         input_structtype = input_structtype.Create_resized(0,input_struct_size)
@@ -474,6 +485,8 @@ class Starsmasher(object):
         Pdirname = self.dirname.ljust(32)
 
         comm.Bcast([inputs,input_structtype],root=MPI.ROOT)
+        #comm.Send([inputs,input_structtype],dest=0,tag=1)
+
         comm.Bcast([Pstartfile1,MPI.CHAR],root=MPI.ROOT)
         comm.Bcast([Pstartfile2,MPI.CHAR],root=MPI.ROOT)
         comm.Bcast([Peosfile,MPI.CHAR],root=MPI.ROOT)
@@ -503,6 +516,11 @@ class Starsmasher(object):
         pass
 
     def run(self,num_of_workers=16):
-        worker = os.path.abspath("src/test_worker_code")
+        worker = os.path.abspath("src/worker_code")
         comm = MPI.COMM_SELF.Spawn(worker,args=[],maxprocs=num_of_workers)
         self.__setAndBcast(comm)
+        comm.barrier()
+        comm.disconnect()
+        MPI.Finalize()
+
+        print "I return contrl immediately"
