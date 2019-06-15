@@ -10,7 +10,7 @@ subroutine PythonSetValues(parent)
     
     !parent mpi process
     integer parent
-
+    !integer status(MPI_STATUS_SIZE)
 
     integer ndisplace
     real*8 displacex, displacey, displacez
@@ -22,11 +22,15 @@ subroutine PythonSetValues(parent)
     real*8 npoly
     common/pydirname/dirname
     common/polytype/npoly
+    common/jumpcomm/tjumpahead 
+    common/ueqstuff/rhocgs,teq,mucgs
+    common/orbitalelements/e0,semimajoraxis
+    real*8 rhocgs, mucgs
+
     
-    type , BIND(C) :: inputs
+    type, BIND(C)  :: inputs
         integer Pndisplace
         real*8 Pdisplacex,Pdisplacey,Pdisplacez
-
         real*8 Psemimajoraxis, Pe0, Pbimpact, Ptrelax
         real*8 Pvinf2, Ptf, Pdtout, Pequalmass  
         integer Pn, Pgflag, Pnnopt, Pnav, Pngr, Pnrelax
@@ -42,7 +46,6 @@ subroutine PythonSetValues(parent)
         integer Pneos, Pnselfgravity, Pncooling, Pnkernel
         real*8 Pgam, Preat, Pteq, Ptjumpahead
         real*8 Pstarmass, Pstarradius
-        logical Pthrowaway
         integer Pstellarevolutioncodetype
         real*8 Pnpoly
 
@@ -51,13 +54,13 @@ subroutine PythonSetValues(parent)
     ! ci = current inputs
     type(inputs) :: ci
 
-    integer :: blocklen(57), typ(57)
+    integer :: blocklen(56), typ(56)
     integer :: input_type, ierr
-    integer(KIND=MPI_ADDRESS_KIND) :: disp(57), base, lb, extent
+    integer(KIND=MPI_ADDRESS_KIND) :: disp(56), base
     
     integer i
 
-    !geting MPI addreses
+   !geting MPI addreses
 
     call MPI_GET_ADDRESS(ci%Pndisplace,disp(1),ierr)
     call MPI_GET_ADDRESS(ci%Pdisplacex,disp(2),ierr)
@@ -114,83 +117,79 @@ subroutine PythonSetValues(parent)
     call MPI_GET_ADDRESS(ci%Ptjumpahead,disp(52),ierr)
     call MPI_GET_ADDRESS(ci%Pstarmass,disp(53),ierr)
     call MPI_GET_ADDRESS(ci%Pstarradius,disp(54),ierr)
-    call MPI_GET_ADDRESS(ci%Pthrowaway,disp(55),ierr)
-    call MPI_GET_ADDRESS(ci%Pstellarevolutioncodetype,disp(56),ierr)
-
-
-    call MPI_GET_ADDRESS(ci%Pnpoly,disp(57),ierr)
+    call MPI_GET_ADDRESS(ci%Pstellarevolutioncodetype,disp(55),ierr)
+    call MPI_GET_ADDRESS(ci%Pnpoly,disp(56),ierr)
 
     base = disp(1)
     
-    do i=1, 57
+    do i=1, 56
        disp(i) = disp(i) - base 
         blocklen(i) = 1
     end do
     
     typ(1) = MPI_INTEGER
-    typ(2) = MPI_DOUBLE
-    typ(3) = MPI_DOUBLE
-    typ(4) = MPI_DOUBLE
-    typ(5) = MPI_DOUBLE
-    typ(6) = MPI_DOUBLE
-    typ(7) = MPI_DOUBLE
-    typ(8) = MPI_DOUBLE
-    typ(9) = MPI_DOUBLE
-    typ(10) = MPI_DOUBLE
-    typ(11) = MPI_DOUBLE
-    typ(12) = MPI_DOUBLE
+    typ(2) = MPI_DOUBLE_PRECISION
+    typ(3) = MPI_DOUBLE_PRECISION
+    typ(4) = MPI_DOUBLE_PRECISION
+    typ(5) = MPI_DOUBLE_PRECISION
+    typ(6) = MPI_DOUBLE_PRECISION
+    typ(7) = MPI_DOUBLE_PRECISION
+    typ(8) = MPI_DOUBLE_PRECISION
+    typ(9) = MPI_DOUBLE_PRECISION
+    typ(10) = MPI_DOUBLE_PRECISION
+    typ(11) = MPI_DOUBLE_PRECISION
+    typ(12) = MPI_DOUBLE_PRECISION
     typ(13) = MPI_INTEGER
     typ(14) = MPI_INTEGER
     typ(15) = MPI_INTEGER
     typ(16) = MPI_INTEGER
     typ(17) = MPI_INTEGER
     typ(18) = MPI_INTEGER
-    typ(19) = MPI_DOUBLE
-    typ(20) = MPI_DOUBLE
-    typ(21) = MPI_DOUBLE
-    typ(22) = MPI_DOUBLE
-    typ(23) = MPI_DOUBLE
-    typ(24) = MPI_DOUBLE
-    typ(25) = MPI_DOUBLE
-    typ(26) = MPI_DOUBLE
-    typ(27) = MPI_DOUBLE
-    typ(28) = MPI_DOUBLE
-    typ(29) = MPI_DOUBLE
-    typ(30) = MPI_DOUBLE
-    typ(31) = MPI_DOUBLE
-    typ(32) = MPI_DOUBLE
-    typ(33) = MPI_DOUBLE
-    typ(34) = MPI_DOUBLE
+    typ(19) = MPI_DOUBLE_PRECISION
+    typ(20) = MPI_DOUBLE_PRECISION
+    typ(21) = MPI_DOUBLE_PRECISION
+    typ(22) = MPI_DOUBLE_PRECISION
+    typ(23) = MPI_DOUBLE_PRECISION
+    typ(24) = MPI_DOUBLE_PRECISION
+    typ(25) = MPI_DOUBLE_PRECISION
+    typ(26) = MPI_DOUBLE_PRECISION
+    typ(27) = MPI_DOUBLE_PRECISION
+    typ(28) = MPI_DOUBLE_PRECISION
+    typ(29) = MPI_DOUBLE_PRECISION
+    typ(30) = MPI_DOUBLE_PRECISION
+    typ(31) = MPI_DOUBLE_PRECISION
+    typ(32) = MPI_DOUBLE_PRECISION
+    typ(33) = MPI_DOUBLE_PRECISION
+    typ(34) = MPI_DOUBLE_PRECISION
     typ(35) = MPI_INTEGER
     typ(36) = MPI_INTEGER
     typ(37) = MPI_INTEGER
     typ(38) = MPI_INTEGER
-    typ(39) = MPI_DOUBLE
-    typ(40) = MPI_DOUBLE
-    typ(41) = MPI_DOUBLE
+    typ(39) = MPI_DOUBLE_PRECISION
+    typ(40) = MPI_DOUBLE_PRECISION
+    typ(41) = MPI_DOUBLE_PRECISION
     typ(42) = MPI_INTEGER
     typ(43) = MPI_INTEGER
-    typ(44) = MPI_DOUBLE
+    typ(44) = MPI_DOUBLE_PRECISION
     typ(45) = MPI_INTEGER
     typ(46) = MPI_INTEGER
     typ(47) = MPI_INTEGER
     typ(48) = MPI_INTEGER
-    typ(49) = MPI_DOUBLE
-    typ(50) = MPI_DOUBLE
-    typ(51) = MPI_DOUBLE
-    typ(52) = MPI_DOUBLE
-    typ(53) = MPI_DOUBLE
-    typ(54) = MPI_DOUBLE
-    typ(55) = MPI_LOGICAL
-    typ(56) = MPI_INTEGER
-    typ(57) = MPI_DOUBLE
+    typ(49) = MPI_DOUBLE_PRECISION
+    typ(50) = MPI_DOUBLE_PRECISION
+    typ(51) = MPI_DOUBLE_PRECISION
+    typ(52) = MPI_DOUBLE_PRECISION
+    typ(53) = MPI_DOUBLE_PRECISION
+    typ(54) = MPI_DOUBLE_PRECISION
+    typ(55) = MPI_INTEGER
+    typ(56) = MPI_DOUBLE_PRECISION
 
     
 
-    call MPI_TYPE_CREATE_STRUCT(57,blocklen,disp,typ,input_type,ierr)
+    call MPI_TYPE_CREATE_STRUCT(56,blocklen,disp,typ,input_type,ierr)
     call MPI_TYPE_COMMIT(input_type,ierr)
 
-
+    !call MPI_Recv(ci,1,input_type,MPI_ANY_SOURCE,1,parent,status,ierr)
     call MPI_BCAST(ci,1,input_type,0,parent,ierr)
     
     call MPI_BCAST(Pstartfile1,255,MPI_CHARACTER,0,parent,ierr)
@@ -263,12 +262,16 @@ subroutine PythonSetValues(parent)
     eosfile = Peosfile
     opacityfile = Popacityfile
     profilefile = Pprofilefile
-    throwaway = ci%Pthrowaway
+    throwaway = .false.
     simulationtype = Psimulationtype
     
     dirname = Pdirname
     npoly = ci%Pnpoly
     
+    stellarevolutioncodetype=ci%Pstellarevolutioncodetype
+    print *, "printing object"
+    print *, ci
+    print *, "semimajoraxis,e0 from mpi subroutine", semimajoraxis, e0 
 end subroutine
 
 subroutine PythonInitializeDouble(parent)
@@ -360,19 +363,41 @@ end subroutine
 subroutine TestSetValues
     include 'starsmasher.h'
     common/simtype/simulationtype
-    
+    common/polytype/npoly
+    real*8 npoly
     character*3 simulationtype
+   
+    common/jumpcomm/tjumpahead
+
+
+
+        print*, semimajoraxis, e0, bimpact, trelax
+        print*, vinf2, tf, dtout, equalmass  
+        print*, n, gflag, nnopt, nav, ngr, nrelax
+        print*, alpha, beta
+        print*, cn1, cn2, cn3, cn4, cn5, cn6, cn7
+        print*, hco, hfloor, tscanon, sepfinal, sep0, treloff 
+        print*, tresplintmuoff
+        print*, nitpot, nintvar, ngravprocs, qthreads
+        print*,  mbh
+        print*, runit, munit
+        print*, computeexclusivemode, ppn
+        print*, omega_spin
+        print*, neos, nselfgravity, ncooling, nkernel
+        print*, gam, reat, teq, tjumpahead
+        print*, starmass, starradius
+        print*, stellarevolutioncodetype
+        print*, npoly
+
+
+    print*,startfile1 
+    print*,startfile2
+    print*,eosfile 
+    print*,opacityfile
+    print*,profilefile
     
-    
-    print *,cn1,cn2,cn3,cn4,cn5,cn6,cn7
-    print *, gam
-    print *, starmass
-    print *, starradius
-    print *, munit
-    print *, runit
-    print *, startfile1
-    print *, startfile2
-    print *, simulationtype
+
+
 end subroutine
 
 subroutine TestSetDoubleValues
