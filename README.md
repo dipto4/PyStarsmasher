@@ -4,10 +4,13 @@ Traditionally, Starsmasher uses a fortran interface and input files like sph.inp
 
 To run the collision script, one needs to evolve a star cluster using NBODY6. The version of NBODY6 that tracks collisions is present here: https://github.com/dipto4/NBODY6_collision_detection
 ## Development History
+June 15, 2019 -- Second version of PyStarsmasher uploaded. Fixed MPI bug wherein a new MPI library had to be compiled with `--disable-dlopen`. The new version requires no extra steps. In addition, the user does not need to execute the script with `mpirun`. Instead, inside the script, the user is able to put the number of workers they want to run the worker code. The shared library approach has been replaced by MPI intercommunicators. 
+
 April 15, 2019 -- First version of PyStarsmasher uploaded. Still in early stages of development. The input functions built inside fortran have been replaced with python counterparts that allow the user to interact with the code using python scripts.
 
 ## Installation and usage instructions
 ### Installing dependencies
+**Please note that this tutorial will be updated soon to reflect the changes from the new version of PyStarsmasher.
 1. Anaconda is recommended as it installs all of the necessary python libraries. Download it from https://www.anaconda.com/distribution/
 2. To install anaconda on gonzales, transfer the file to your gonzales home directory and type in `bash <name of anaconda installation file>`. Follow the on screen instructions. When it prompts you if you want to modify the `.bashrc` file, say yes.
 3. Log out and log back in for the anaconda environment to take effect. If you would like to see if anaconda has been installed properly, type `python` into the command line and make sure the first line says `Python 2.7.13 |Anaconda 4.4.0 (64-bit)| (default, Dec 20 2016, 23:09:15)` or something similar. Type `exit()` to get out of the python command line. The scripts, currently, are only compatible with python 2.7 so it is recommended that you install the python 2.7 version of anaconda.
@@ -23,6 +26,31 @@ April 15, 2019 -- First version of PyStarsmasher uploaded. Still in early stages
 
 ### Using PyStarsmasher
 Below is a sample script that highlights how PyStarsmasher works:
+```
+from PyStarsmasher import Starsmasher
+
+someSimulation = Starsmasher()
+
+
+someSimulation.n = 10000        # particles per simulation
+someSimulation.nnopt = 23       # Nearest neighbors
+someSimulation.dtout = 1        # Output frequency
+someSimulation.tf = 200         # Final time (in SPH units)
+
+someSimulation.starmass = 0.5   # units are MSun
+someSimulation.starradius = 0.3 # units are RSun
+
+someSimulation.ppn = 16
+someSimulation.simulationType = '1es'   # Relaxation run
+
+someSimulation.run(num_of_workers=16)   # setParams() and runSim() have been replaced
+
+```
+
+
+
+Here is a script demonstrating how the **old version** works.
+
 ```
 from PyStarsmasher import Starsmasher
 
@@ -52,6 +80,5 @@ Unlike traditional Starsmasher, the data generated through PyStarsmasher is put 
 
 
 ## Known Bugs
-1. The MPI issue, as mentioned before, is a major bug. Fixes are being tested. 
-2. Using `mpirun -n 16 python test.py` ensures that PyStarsmasher lets the fortran code use 16 threads to run the code. However, it also means that the script is run 16 times in parallel. This can be problematic when you're printing something or creating a file inside the script.
-3. I believe there are memory leaks within the program. Need to check...
+1. I believe there are memory leaks within the program. Need to check...
+2. The merger script is buggy. An update is coming soon.
