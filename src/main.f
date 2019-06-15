@@ -8,7 +8,6 @@ c *****************************************
 c ADDED BY DIPTO
 c converts this into a subroutine
 c added 'comm' as an input to subroutine
-      subroutine mainRun()
       include 'starsmasher.h'
       include 'mpif.h'
       
@@ -18,19 +17,34 @@ c added 'comm' as an input to subroutine
       common /jumpcomm/ tjumpahead
       logical autotf
       common/autotfblock/autotf
-        
+      common/simtype/simulationtype
+      character*3 simulationtype
+      logical flag
+      integer parent
 
       !nprocs = 12
       omeg=0.d0
       gonedynamic=.false.
 c mpi initialization:
       call mpi_init(ierr)
-c changed mpi_comm_world to comm      
+      call MPI_Initialized(flag,ierr)
+c changed mpi_comm_world to comm
+      call mpi_comm_get_parent(parent,ierr)
       call mpi_comm_rank(mpi_comm_world,myrank,ierr)
       call mpi_comm_size(mpi_comm_world,nprocs,ierr)
+      
+      !if(parent .ne. mpi_comm_null) then
+      !    call mpi_barrier(parent,ierr)
+      !end if 
+      
       omega2=0
-      call init
 
+      call PythonSetValues(parent)
+      
+      !call TestSetValues
+
+      call init
+        print *, "do i get here"
       if(myrank.eq.0) write(69,*) 'nprocs=',nprocs
 
 c      if(myrank.eq.0) then
@@ -49,7 +63,7 @@ c     main program loop:
      $              dabs(x(i)).gt.dabs(xcm2)*2.5d0) then
                   write(69,*) 'particle',i,'at',
      $                 x(i),y(i),z(i),
-     $                 'has overflowed an outer lagrangian point'
+     $                 'has oveerflowed an outer lagrangian point'
                   print *,'xcm1,xcm2,omeg=',xcm1,xcm2,omeg
                   write(69,*) 'will now stop run'
                   if(myrank.eq.0) then
@@ -112,11 +126,15 @@ c            beta=2.d0
                close(69)
             endif
             ! this was causing issues. lets see if changing it helps
-            !call mpi_finalize(ierr)
+            call mpi_barrier(parent,ierr)
+            call mpi_comm_disconnect(parent,ierr)
+            call mpi_finalize(ierr)
          endif
       enddo
 c      call shiftboundmasstoorigin
-      end subroutine
+      !call mpi_comm_disconnect(parent,ierr)
+      !call mpi_finalize(ierr)
+      end 
 ***********************************************************************
       subroutine mainit
 c     main iteration
