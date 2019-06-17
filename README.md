@@ -23,6 +23,8 @@ April 15, 2019 -- First version of PyStarsmasher uploaded. Still in early stages
 1. Go into the `src` folder inside the repository directory and type in `make -f makefile.gonzales_ifort`.
 2. PyStarsmasher should be ready now. To use it, create a script and run it. An example script has been provided below.
 
+## Old Version
+
 ### Installing dependencies
 1. Anaconda is recommended as it installs all of the necessary python libraries. Download it from https://www.anaconda.com/distribution/
 2. To install anaconda on gonzales, transfer the file to your gonzales home directory and type in `bash <name of anaconda installation file>`. Follow the on screen instructions. When it prompts you if you want to modify the `.bashrc` file, say yes.
