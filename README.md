@@ -9,8 +9,23 @@ June 15, 2019 -- Second version of PyStarsmasher uploaded. Fixed MPI bug wherein
 April 15, 2019 -- First version of PyStarsmasher uploaded. Still in early stages of development. The input functions built inside fortran have been replaced with python counterparts that allow the user to interact with the code using python scripts.
 
 ## Installation and usage instructions
+
+## New Version
+
 ### Installing dependencies
-**Please note that this tutorial will be updated soon to reflect the changes from the new version of PyStarsmasher.**
+1. Anaconda is recommended as it installs all of the necessary python libraries. Download it from https://www.anaconda.com/distribution/
+2.To install anaconda on gonzales, transfer the file to your gonzales home directory and type in `bash <name of anaconda installation file>`. Follow the on screen instructions. When it prompts you if you want to modify the `.bashrc` file, say yes.
+3. Log out and log back in for the anaconda environment to take effect. If you would like to see if anaconda has been installed properly, type `python` into the command line and make sure the first line says `Python 2.7.13 |Anaconda 4.4.0 (64-bit)| (default, Dec 20 2016, 23:09:15)` or something similar. Type `exit()` to get out of the python command line. The scripts, currently, are only compatible with python 2.7 so it is recommended that you install the python 2.7 version of anaconda.
+4. Load the openMPI module. To view what modules are available type `module list` into the terminal. 
+5. Install the latest version of mpi4py from source code. Instructions and files can be found at : ()[https://mpi4py.readthedocs.io/en/stable/install.html]. Follow the instructions for installing via distutils. 
+
+### Installing PyStarsmasher
+1. Go into the `src` folder inside the repository directory and type in `make -f makefile.gonzales_ifort`.
+2. PyStarsmasher should be ready now. To use it, create a script and run it. An example script has been provided below.
+
+## Old Version
+
+### Installing dependencies
 1. Anaconda is recommended as it installs all of the necessary python libraries. Download it from https://www.anaconda.com/distribution/
 2. To install anaconda on gonzales, transfer the file to your gonzales home directory and type in `bash <name of anaconda installation file>`. Follow the on screen instructions. When it prompts you if you want to modify the `.bashrc` file, say yes.
 3. Log out and log back in for the anaconda environment to take effect. If you would like to see if anaconda has been installed properly, type `python` into the command line and make sure the first line says `Python 2.7.13 |Anaconda 4.4.0 (64-bit)| (default, Dec 20 2016, 23:09:15)` or something similar. Type `exit()` to get out of the python command line. The scripts, currently, are only compatible with python 2.7 so it is recommended that you install the python 2.7 version of anaconda.
