@@ -3,8 +3,10 @@
 
 subroutine PythonSetValues(parent)
 
-    use mpi
+    !use mpi
+    !include 'mpif.h'
     include 'starsmasher.h'
+    include 'mpif.h'
     common/displace/displacex,displacey,displacez,ndisplace
     common/simtype/simulationtype
     
@@ -275,8 +277,10 @@ subroutine PythonSetValues(parent)
 end subroutine
 
 subroutine PythonInitializeDouble(parent)
-    use mpi
+    !use mpi
     include 'starsmasher.h'
+    include 'mpif.h'
+
 
     common/doubleinitialize/x1,y1,z1,x2,y2,z2,vx1,vy1,vz1,vx2,vy2,vz2,m1,m2
     
