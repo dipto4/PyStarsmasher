@@ -13,13 +13,16 @@ import fnmatch
 class Starsmasher(object):
     __instance__ = None
 
-    def __init__(self):
+    def __init__(self,num_of_workers=1):
         Starsmasher.__instance__ = self
 
         #self.library = cdll.LoadLibrary('./libstarsmasher.so')
-        #self.toolsLibrary = cdll.LoadLibrary('./tools.so')
+        #self.toolsLibrary = cdll.LoadLibrary('./tools/tools.so')
         # The following variables are present in
         # sph.input
+
+        self.num_of_workers = num_of_workers
+
 
         self.ndisplace = 0
         self.displacex = 0.0
@@ -113,7 +116,7 @@ class Starsmasher(object):
         self.star2 = Star()
 
 
-    def __errorHandler():
+    def __errorHandler(self):
         # 1 = Error in Inputs
         # 2 = Internal Error. Check log / inputs
         # 2 is triggered when control returns to python and tfinal
@@ -136,22 +139,35 @@ class Starsmasher(object):
                     "txt" : 13,
                     "dbl" : 14}
 
-            value = simulationtypes[self.simulationtype]
+            value = simulationtypes.get(self.simulationtype, None)
+
+            print value
             if (value is None):
                 raise SimulationTypeError
 
             if(self.n <= 0):
-                raise ValueTooSmallError
+                print("n must be a positive number")
+                raise BadValueError
             if(self.starmass <= 0):
-                raise ValueTooSmallError
+                print("starmass must be a positive number")
+                raise BadValueError
             if(self.starradius <= 0):
-                raise ValueTooSmallError
+                print("starradius must be a positive number")
+                raise BadValueError
+            if(self.npoly <= 0):
+                print("npoly has to be greater than zero")
+                raise BadValueError
+            if(self.num_of_workers <=0 or isinstance(self.num_of_workers,float)):
+                print("Something wrong with num_of_workers")
+                raise BadValueError
+
             if(self.tf <= 0 ):
-                raise ValueTooSmallError
+                print("tf cannot be less than 0")
+                raise BadValueError
         except SimulationTypeError:
-            print("Error in Simulation Type. Check it")
-        except ValueTooSmallError:
-            print("Some value is lower than zero. Check it")
+            print("Unexpected Simulation Type")
+        except BadValueError:
+            print("Unexpected value found!")
         pass
     #TODO: implement the mpi based setValuesStarsmasher_mpi function
     #TODO: throwaway causes issues. CHange it
@@ -272,144 +288,6 @@ class Starsmasher(object):
 
 
     # note: this function is set to be deprecated and removed in later versions
-    def __setValuesStarsmasher_old(self):
-
-        self.__getGamForStar()
-
-
-        # Converting the values to their corresponding ctypes
-        # values to be able to be used in a fortran program
-        # NOTE: for passing strings, c_char is not used
-        # Rather, use <string>.ljust(255). 255 is the character width
-        # Pass all non strings as byref() to the subroutine
-
-        Pndisplace = c_int(self.ndisplace)
-        Pdisplacex = c_double(self.displacex)
-        Pdisplacey = c_double(self.displacey)
-        Pdisplacez = c_double(self.displacez)
-
-        Psemimajoraxis = c_double(self.semimajoraxis)
-        Pbimpact = c_double(self.bimpact)
-        Pe0 = c_double(self.e0)
-        Pvinf2 = c_double(self.vinf2)
-
-        Ptf  = c_double(self.tf)
-        Pdtout = c_double(self.dtout)
-
-        Pn = c_int(self.n)
-
-        Pgflag = c_int(self.gflag)
-        Pnnopt = c_int(self.nnopt)
-        Pnav = c_int(self.nav)
-        Palpha = c_double(self.alpha)
-        Pbeta = c_double(self.beta)
-        Pngr = c_int(self.ngr)
-        Phco = c_double(self.hco)
-        Phfloor = c_double(self.hfloor)
-        Pnrelax = c_int(self.nrelax)
-        Ptrelax = c_double(self.trelax)
-
-        Psep0 = c_double(self.sep0)
-        Pequalmass = c_double(self.equalmass)
-        Ptreloff= c_double(self.treloff)
-        Ptresplintmuoff = c_double(self.tresplintmuoff)
-
-        Pnitpot = c_int(self.nitpot)
-        Ptscanon = c_double(self.tscanon)
-        Psepfinal = c_double(self.sepfinal)
-        Pnintvar = c_int(self.nintvar)
-
-        Pngravprocs = c_int(self.ngravprocs)
-        Pqthreads = c_int(self.qthreads)
-
-        Pmbh = c_double(self.mbh)
-        Prunit = c_double(self.runit)
-        Pmunit = c_double(self.munit)
-
-        Pcn1 = c_double(self.cn1)
-        Pcn2 = c_double(self.cn2)
-        Pcn3 = c_double(self.cn3)
-        Pcn4 = c_double(self.cn4)
-        Pcn5 = c_double(self.cn5)
-        Pcn6 = c_double(self.cn6)
-        Pcn7 = c_double(self.cn7)
-
-        Pcomputeexclusivemode = c_int(self.computeexclusivemode)
-
-        Pomega_spin = c_double(self.omega_spin)
-        Pppn = c_int(self.ppn)
-        Pneos = c_int(self.neos)
-        Pnselfgravity = c_int(self.nselfgravity)
-        Pgam = c_double(self.gam)
-        Preat = c_double(self.reat)
-        Pnpoly = c_double(self.npoly)
-        #starmass and starradius are in units of
-        #Msun and Rsun
-
-        Pstarmass = c_double(self.starmass)
-        Pstarradius = c_double(self.starradius)
-        Pncooling = c_int(self.ncooling)
-        Pnkernel = c_int(self.nkernel)
-        Pteq = c_double(self.teq)
-
-        Ptjumpahead = c_double(self.tjumpahead)
-        Pstartfile1 = self.startfile1.ljust(255)
-        Pstartfile2 = self.startfile2.ljust(255)
-
-        Peosfile = self.eosfile.ljust(255)
-        Popacityfile = self.opacityfile.ljust(255)
-
-        Pprofilefile = self.profilefile.ljust(255)
-        Pthrowaway = c_bool(self.throwaway)
-
-        Pstellarevolutioncodetype = c_int(self.stellarevolutioncodetype)
-
-        # The following parameters are present in sph.init
-
-        Psimulationtype = self.simulationtype.ljust(3)
-        Pdirname = self.dirname.ljust(32)
-        #giant subroutine
-        # is there a better way to do this?
-
-        self.library.pythonsetvalues_(
-                byref(Pndisplace), byref(Pdisplacex), byref(Pdisplacey), byref(Pdisplacez), byref(Psemimajoraxis),
-                byref(Pbimpact),byref(Pe0),byref(Pvinf2), byref(Ptf), byref(Pdtout), byref(Pn), byref(Pgflag), byref(Pnnopt),
-                byref(Pnav), byref(Palpha), byref(Pbeta), byref(Pngr),
-                byref(Phco), byref(Phfloor),byref(Pnrelax),byref(Ptrelax),byref(Psep0),
-                byref(Pequalmass),byref(Ptreloff),byref(Ptresplintmuoff),byref(Pnitpot),
-                byref(Ptscanon),byref(Psepfinal),byref(Pnintvar),byref(Pngravprocs),byref(Pqthreads),byref(Pmbh),
-                byref(Prunit),byref(Pmunit),byref(Pcn1),byref(Pcn2),byref(Pcn3),
-                byref(Pcn4),byref(Pcn5),byref(Pcn6),byref(Pcn7),byref(Pcomputeexclusivemode),byref(Pomega_spin),
-                byref(Pppn),byref(Pneos),byref(Pnselfgravity),byref(Pgam),
-                byref(Preat), byref(Pstarmass),byref(Pstarradius), byref(Pncooling), byref(Pnkernel), byref(Pteq),
-                byref(Ptjumpahead), Pstartfile1,Pstartfile2,
-                Peosfile,Popacityfile,Pprofilefile,byref(Pthrowaway),byref(Pstellarevolutioncodetype),Psimulationtype,
-                Pdirname,byref(Pnpoly))
-
-
-        if(self.simulationtype == 'dbl'):
-            Px1 = c_double(self.star1.x)
-            Py1 = c_double(self.star1.y)
-            Pz1 = c_double(self.star1.z)
-            Pvx1 = c_double(self.star1.vx)
-            Pvy1 = c_double(self.star1.vy)
-            Pvz1 = c_double(self.star1.vz)
-            Pm1 = c_double(self.star1.m)
-
-            Px2 = c_double(self.star2.x)
-            Py2 = c_double(self.star2.y)
-            Pz2 = c_double(self.star2.z)
-            Pvx2 = c_double(self.star2.vx)
-            Pvy2 = c_double(self.star2.vy)
-            Pvz2 = c_double(self.star2.vz)
-            Pm2 = c_double(self.star2.m)
-
-            self.library.pythoninitializedouble_(byref(Px1),byref(Py1),byref(Pz1),
-                    byref(Px2),byref(Py2),byref(Pz2),byref(Pvx1),byref(Pvy1),byref(Pvz1),
-                    byref(Pvx2),byref(Pvy2),byref(Pvz2),byref(Pm1),byref(Pm2))
-
-        pass
-
     def __getErrorFromStarsmasher():
         pass
 
@@ -455,13 +333,6 @@ class Starsmasher(object):
         else:
             self.gam = (5.0)/(3.0)
 
-
-    def __runStarsmasher(self):
-        #fcomm = MPI.COMM_WORLD
-        self.library.mainrun_()
-        #fcomm.Barrier()
-        pass
-
     def __setAndBcast(self,comm):
 
         if (not os.path.isdir(self.dirname)):
@@ -500,27 +371,13 @@ class Starsmasher(object):
             comm.Bcast([inputs_double_s2,input_double_structtype],root=MPI.ROOT)
 
 
-    def setParams(self):
-        self.__setValuesStarsmasher()
-        if (not os.path.isdir(self.dirname)):
-            os.system("mkdir " + self.dirname)
-        pass
+    def run(self):
+        self.__errorHandler()
 
-
-    def runsim(self):
-        #for i in range(12):
-        #    p = Process(target=self.__runStarsmasher())
-        #    p.start()
-        #    p.join()
-        self.__runStarsmasher()
-        pass
-
-    def run(self,num_of_workers=16):
         worker = os.path.abspath("src/worker_code")
-        comm = MPI.COMM_SELF.Spawn(worker,args=[],maxprocs=num_of_workers)
+        comm = MPI.COMM_SELF.Spawn(worker,args=[],maxprocs=self.num_of_workers)
         self.__setAndBcast(comm)
         comm.barrier()
-        #comm.disconnect()
+        comm.disconnect()
         MPI.Finalize()
 
-        print "I return contrl immediately"
