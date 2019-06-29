@@ -3,7 +3,7 @@ class Error(Exception):
     pass
 
 class BadValueError(Error):
-    """When the user inputs values smaller than allowed value"""
+    """When the user inputs wrong value"""
     pass
 
 
