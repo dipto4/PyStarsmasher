@@ -1,8 +1,0 @@
-FC=gfortran
-FCFLAGS= -fPIC -shared -ffixed-line-length-132
-LIBFILE=merger.so
-toolsmake:
-	$(FC) $(FCFLAGS) -o $(LIBFILE) elements.f orig.f trajectories.f calccom.f compbest3.f main_getMergerProduct.f90 
-
-clean:
-	rm *.so
