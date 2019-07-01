@@ -17,7 +17,7 @@ class Starsmasher(object):
         Starsmasher.__instance__ = self
 
         #self.library = cdll.LoadLibrary('./libstarsmasher.so')
-        #self.toolsLibrary = cdll.LoadLibrary('./tools/tools.so')
+        self.toolsLibrary = cdll.LoadLibrary('./tools/tools.so')
         # The following variables are present in
         # sph.input
 
@@ -310,12 +310,21 @@ class Starsmasher(object):
         mass3 = c_double(0)
         self.toolsLibrary.getmergerproduct_(Pfilename,byref(mass1),byref(mass2),byref(mass3))
 
+
+        # mass1 > mass2 > mass3
+
         if(abs(mass1.value) <= 1.e-3):
             mass1 = None
+        else:
+            mass1 = mass1.value
         if(abs(mass2.value) <= 1.e-3):
             mass2 = None
+        else:
+            mass2 = mass2.value
         if(abs(mass3.value) <= 1.e-3):
             mass3 = None
+        else:
+            mass3 = mass3.value
 
         return mass1,mass2,mass3
 
