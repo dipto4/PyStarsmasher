@@ -286,8 +286,6 @@ class Starsmasher(object):
 
         pass
 
-
-    # note: this function is set to be deprecated and removed in later versions
     def __getErrorFromStarsmasher():
         pass
 
@@ -306,10 +304,21 @@ class Starsmasher(object):
         return fls[-1]
 
     def getBoundMass(self,filename):
-        Pfilename = filename.ljust(255)
-        Fboundmass = c_double(0.0)
-        self.toolsLibrary.calculateboundmass_(Pfilename,byref(Fboundmass))
-        return Fboundmass.value
+        Pfilename = filename.ljust(32)
+        mass1 = c_double(0)
+        mass2 = c_double(0)
+        mass3 = c_double(0)
+        self.toolsLibrary.getmergerproduct_(Pfilename,byref(mass1),byref(mass2),byref(mass3))
+
+        if(abs(mass1.value) <= 1.e-3):
+            mass1 = None
+        if(abs(mass2.value) <= 1.e-3):
+            mass2 = None
+        if(abs(mass3.value) <= 1.e-3):
+            mass3 = None
+
+        return mass1,mass2,mass3
+
 
     def __getGamForStar(self):
         if (self.starmass >= 1.0):
