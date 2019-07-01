@@ -4,6 +4,9 @@ Traditionally, Starsmasher uses a fortran interface and input files like sph.inp
 
 To run the collision script, one needs to evolve a star cluster using NBODY6. The version of NBODY6 that tracks collisions is present here: https://github.com/dipto4/NBODY6_collision_detection
 ## Development History
+
+July 1, 2019 -- Updated merger routine that can detect upto three stars is included in the new version making the merger detection routine more robust.
+
 June 15, 2019 -- Second version of PyStarsmasher uploaded. Fixed MPI bug wherein a new MPI library had to be compiled with `--disable-dlopen`. The new version requires no extra steps. In addition, the user does not need to execute the script with `mpirun`. Instead, inside the script, the user is able to put the number of workers they want to run the worker code. The shared library approach has been replaced by MPI intercommunicators. 
 
 April 15, 2019 -- First version of PyStarsmasher uploaded. Still in early stages of development. The input functions built inside fortran have been replaced with python counterparts that allow the user to interact with the code using python scripts.
