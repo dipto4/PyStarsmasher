@@ -98,5 +98,4 @@ Unlike traditional Starsmasher, the data generated through PyStarsmasher is put 
 
 
 ## Known Bugs
-1. I believe there are memory leaks within the program. Need to check...
-2. The merger script is buggy. An update is coming soon.
+1. Memory leaks at places. Currently trying to fix them. 
