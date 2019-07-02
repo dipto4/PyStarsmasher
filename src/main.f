@@ -26,8 +26,14 @@ c added 'comm' as an input to subroutine
       omeg=0.d0
       gonedynamic=.false.
 c mpi initialization:
-      call mpi_init(ierr)
+      !call mpi_init(ierr)
       call MPI_Initialized(flag,ierr)
+
+      if (flag .eqv. .false.) then
+          call mpi_init(ierr)
+        end if
+
+
 c changed mpi_comm_world to comm
       call mpi_comm_get_parent(parent,ierr)
       call mpi_comm_rank(mpi_comm_world,myrank,ierr)
@@ -41,10 +47,6 @@ c changed mpi_comm_world to comm
 
       call PythonSetValues(parent)
       
-      if (simulationtype .eq. 'dbl') then
-          call PythonInitializeDouble(parent)
-      end if
-
       !call TestSetValues
 
       call init
@@ -74,7 +76,7 @@ c     main program loop:
                      close(22)
                      close(69)
                   endif
-                  !call mpi_finalize(ierr)
+                  call mpi_finalize(ierr)
                   stop
                endif
             enddo
@@ -130,14 +132,19 @@ c            beta=2.d0
                close(69)
             endif
             ! this was causing issues. lets see if changing it helps
-            call mpi_barrier(parent,ierr)
-            call mpi_comm_disconnect(parent,ierr)
+            !call mpi_comm_disconnect(parent,ierr)
+            !call mpi_barrier(parent,ierr)
+            !call mpi_comm_free(parent,ierr)
+            !call mpi_abort(parent,ierr)
             !call mpi_finalize(ierr)
          endif
       enddo
 c      call shiftboundmasstoorigin
       !call mpi_comm_disconnect(parent,ierr)
       !call mpi_finalize(ierr)
+      call mpi_barrier(parent,ierr)
+      !call mpi_comm_free(parent,ierr)
+      call mpi_finalize(ierr)
       end 
 ***********************************************************************
       subroutine mainit
