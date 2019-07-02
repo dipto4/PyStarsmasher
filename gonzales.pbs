@@ -5,4 +5,4 @@
 
 source ~/.bashrc
 cd "$PBS_O_WORKDIR"
-mpirun -n 16 python collisionScript.py > output 
+python collisionScript.py > output 
