@@ -36,7 +36,7 @@ def relax_star(code, name,mass, cnum=None):
         code.npoly = 3
     code.starmass = mass
     #code.setParams()
-    code.run(num_of_wokers=16)
+    code.run()
 
 def collide_stars(cnum,code,file1,file2,s1,s2):
     code.tf = 600
@@ -91,7 +91,7 @@ def collide_stars(cnum,code,file1,file2,s1,s2):
     code.tf = 4000
 
     #code.setParams()
-    code.run(num_of_workers=16)
+    code.run()
 
 
 def run():
