@@ -396,5 +396,5 @@ class Starsmasher(object):
         comm = MPI.COMM_SELF.Spawn(worker,args=[],maxprocs=self.num_of_workers)
         self.__setAndBcast(comm)
         comm.barrier()
-        MPI.Finalize()
+        #MPI.Finalize()
 
