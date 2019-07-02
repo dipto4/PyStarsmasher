@@ -41,6 +41,10 @@ c changed mpi_comm_world to comm
 
       call PythonSetValues(parent)
       
+      if (simulationtype .eq. 'dbl') then
+          call PythonInitializeDouble(parent)
+      end if
+
       !call TestSetValues
 
       call init
@@ -70,7 +74,7 @@ c     main program loop:
                      close(22)
                      close(69)
                   endif
-                  call mpi_finalize(ierr)
+                  !call mpi_finalize(ierr)
                   stop
                endif
             enddo
@@ -128,7 +132,7 @@ c            beta=2.d0
             ! this was causing issues. lets see if changing it helps
             call mpi_barrier(parent,ierr)
             call mpi_comm_disconnect(parent,ierr)
-            call mpi_finalize(ierr)
+            !call mpi_finalize(ierr)
          endif
       enddo
 c      call shiftboundmasstoorigin
