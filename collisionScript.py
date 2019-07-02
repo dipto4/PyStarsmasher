@@ -35,8 +35,8 @@ def relax_star(code, name,mass, cnum=None):
     else:
         code.npoly = 3
     code.starmass = mass
-    code.setParams()
-    code.runsim()
+    #code.setParams()
+    code.run(num_of_wokers=16)
 
 def collide_stars(cnum,code,file1,file2,s1,s2):
     code.tf = 600
@@ -90,8 +90,8 @@ def collide_stars(cnum,code,file1,file2,s1,s2):
 
     code.tf = 4000
 
-    code.setParams()
-    code.runsim()
+    #code.setParams()
+    code.run(num_of_workers=16)
 
 
 def run():
@@ -214,8 +214,8 @@ def run():
             fil = code.getLastOutFile(out_folder)
             fmerger = out_folder+'/'+fil
 
-            boundMass = code.getBoundMass(fmerger)
-            relax_star(code,-1, boundMass, coll_count)
+            boundMass1, boundMass2, boundMass3 = code.getBoundMass(fmerger)
+            relax_star(code,-1, boundMass1, coll_count)
 
             file1 = 'relax_coll_'+str(coll_count)+'/out0300.sph'
             file2 = 'relax_'+str(ns[1])+'/out0300.sph'
