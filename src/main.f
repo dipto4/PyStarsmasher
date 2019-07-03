@@ -46,7 +46,13 @@ c changed mpi_comm_world to comm
       omega2=0
 
       call PythonSetValues(parent)
-      
+        
+
+      if (simulationtype .eq. 'dbl') then
+          call PythonInitializeDouble(parent)
+      end if 
+
+
       !call TestSetValues
 
       call init
